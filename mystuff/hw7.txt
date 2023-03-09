@@ -1,0 +1,55 @@
+1.1 We start by drawing a directed graph to represent this supply and demand situation. Let source node be called X and sink node be called Y. Let sO, sA, sB, and sAB be nodes representing supply nodes, and dO, dA, dB, and dAB be nodes representing demand nodes. We draw the edges from X to each of sO, sA, sB, and sAB. Each of these edges has capacity of sO, sA, sB, and sAB given in the problem (aka supply amount of blood). We also draw edges from dO, dA, dB, and dAB to the sink node, Y. Each of these edges has capacity of dO, dA, dB, and dAB given in the problem (aka demand amount of blood for each type).
+
+Next, we draw edges between the s nodes and the d nodes depending on who can give who blood. Thus, there would be an edge from sO to all d nodes; there would be an edge from sA to dA and dAB; there would be an edge from sB to dB and dAB; and there would be an edge from sAB to dAB. Each of these edges has capacity infinite.
+
+We run the max-flow algorithm ford fulkerson on this graph we have just created and in polynomial time, we can calculate the max flow number. If this max flow exaclty equals dO + dA + dB + dAB, then the blood on hand would suffice for the projected need. This is because if this sum were to equal max flow, since the capacities of all the edges neighbor to Y are dO, dA, dB, and dAB, respectively, each edge must be filled to capacity.
+
+1.2 NOTE IN PROBLEM: the demand actually sums up to 98 instead of 100 :(. We will assume that the numbers in the table are correct and ask if 105 units of blood on hand can satisfy 98 units of demand. The answer is no, and we can run the max flow algorithm to figure out that indeed the flow is less than 98 and is actually 97. 
+
+This number 97 can be achieved if 45 sO give to 45 dO, 5 sO and 36 sA give to 41 dA, 8 sB give to 8 dB, and 3 sAB give to 3 dAB. This is a total of 97 patients satisfied.
+
+Minimum capacity cut 
+
+
+
+
+*insert trash image*
+
+
+
+
+the sum of all the outgoing edges is 97 therefore the min cut is 97 and the max flow by the max-flow min-cut theorem is 97. As for the explanation understandable to clinic administrators, People of type A blood can only receive from people of type O and other people of type A. We have a deficit of 42-36 = 6 people of type A blood that need donors. However, we know that 45 donors of type O blood have to give the 45 type O receivers because type O cannot receive from anyone else. This leaves 5 type O donors left for other people. We need 6, so one type A blood receiver will not get any blood :(. 
+
+2
+Step 1: look at the edge that we will decrement from. Let the input and output vertex of that edge be v1 and v2.
+Step 2: now, we find a path from source s to v1, and a path from v2 to sink t. We decrement the flow value of each of the edges by 1. (we get the flow value from running the ford-fulkerson algorithm). 
+Step 3: We rerun one iteration of ford-fulkerson and find an augmenting path. If there is an augmenting path, then final flow is just the original max flow value. Otherwise, the final flow is the original max flow value minus one.
+
+The one iteration of ford-fulkerson to find augmenting path is just a DFS which takes O(V + E) time. The DFS from s to v1 and v2 to t also takes O(V + E) time so the total complexity of this algorithm is O(V + E).
+
+NOTE: when I say V + E I mean m + n.
+
+3 Since each edge has unit capacity, there are a couple of cases we can consider to advance our understanding of the graph. Case 1 is when one edge splits off into two. This will not add anything to our flow because the maximum flow of this small subset of the graph is still 1. Another case is when two edges flow into one edge. The max flow is still 1 because the final edge has capacity 1. We realize that the max flow of this sort of graph is essentially the number of distinct paths from source to sink. Thus, all we have to do is run ford-fulkerson max-flow algorithm on the graph to get the flows for each edge. Then, we dfs/bfs from the sink node back to the source node, following all the edges with flow 1 and ignoring the edges with flow 0. This way, we end up with a bunch of paths from sink to source.
+
+(They will all be disjoint and actual paths because of the key points we discovered about paths above: two edges cannot flow into one edge and if one edge splits into two, one of the edges must have flow 0 and the other flow 1). 
+
+After doing this, and partitioning a subset of the edges into separate paths, all we have to do is delete one edge from each path up to a value of k, thereby decrementing the max flow by 1 with every cut. NOTE: if the value of k is more than the value of the number of paths, we can just randomly delete edges because by then the flow is 0 (as the graph is disjoint).
+
+The complexity of this algorithm is just the complexity of the portion that takes the most time aka the ford-fulkerson algorithm, which is polynomial-time.
+
+4.1 We can use what we discovered about paths and capacity one edges in the previous problem to solve this one. All we have to do is let a source node A be connected to all nodes X with capacity 1 each. Similarly, let all nodes S be connected to a sink node B be connected to all nodes in S with capacity infinite each. Let all the roads have capacity of 1. I claim that the max flow of the graph from source A to sink B must equal X otherwise there is no possible set of evacuation routes. First of all, finding the max flow of a graph with capacity 1 edges is very powerful. We are essentially saying that two paths cannot use the same edge, as if two paths use the same edge, their max flow will be limited to that one edge's capacity, which is 1. Thus, one of the paths will get "kicked out." The max flow of the graph must equal X because the input flow is X and therefore the output flow must be X as well. If the output flow is X - 1, then there was one path that coincided with another path through an edge, and got kicked out, narrowing the flow from 2 to 1 due to that edge with capacity 1. Note that the size of S does not matter in this part of the problem. S can be 1 node and that is fine because the capacity of nodes from S to B are infinite. It is just the intermediary edges between X nodes and S nodes that have capacity 1.
+
+4.2 This problem is a little trickier, as now we cannot have paths even share the same node. A trick to jump over this new requirement is to take every node and replace it with two nodes connected by one edge. For example, if A -> B -> C, we would replace B with -> B1 -> B2 -> with the edge between B1 and B2 having capacity 1. This way, if there were two paths that were to go through node B like this:
+
+A1 -- B -- A2
+C1 _/   \_ C2
+
+(this works for part 1 of the problem as no edge is shared), there will be a problem. The graph will now look like this
+
+A1 -- B1 -- B2 -- A2
+C1 _/        \_ C2
+
+and since the edge between B1 and B2 has capacity 1, both A1 and C1 will not be able to go through B1 without one of them getting "kicked out." We now proceed in the same way as in part 1 of the problem and test if the max flow is equal to the number of input populated cities |X|. 
+
+An example that works in question a but not in question b is literally the small ascii graph I drew above. If A1 and C1 are populated cities, and A2 and C2 are safe cities, then in part 1, they would be able to reach their safe destinations without using the same edge. However, in part 2, they would have to use the same city B, and would therefore fail the requirements of the problem.
+

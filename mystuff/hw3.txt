@@ -1,0 +1,26 @@
+1.
+We first proceed to topologically sort the graph using bfs. This requires O(E) complexity to complete.
+After retrieving a set of vertices S, we loop through all of the elements and check if there is an edge between each consecutive element. If there is none, then we can safely assume that it is impossible for the graph to be semi-connected. If there is no graph between two consecutive elements A and B in the topological sort, then the only way to get to B is through another node C which occurs before B. By definition of consecutive, this node C must also occur before A. However, it is impossible for A to go to a node before itself in the topological sort. Thus, there is no path from A to B.
+After checking all consecutive pairs of vertices in the topological sort (we are guaranteed at most E tests because that is the total number of edges in the graph), we can then say that the graph is semi-connected. In fact, for any two vertices if we want to find a path between them we just look them up in the topological sort and go from the higher one to the lower one.
+
+2. 
+NOTES: we are given functions to a) conduct topological sort and b) decompose a graph into SCCs
+Step 1: use Kosaraju's to decompose the graph into SCCs.
+Step 2: Pretend each SCC is a single node in the graph. By definition of strongly connected components, the resulting graph from assuming that each SCC is a single node must be acyclic. Pretend this is not true for the sake of contradiction. Then, there must be a cycle involving two or more "nodes." Then, we can combine the two "nodes" aka SCCs into one bigger SCC. This is a contradiction.
+Step 3: Now that we have an acyclic graph of "big nodes," we proceed with the algorithm created in Problem 1 to test semi-connectivity in the graph in O(E) time, where E is the number of edges in the newly created graph with the "big nodes."
+FOOTNOTE: Kosaraju's runs in O(V+E), but the maximum value of V is E + 1, thus, O(V + E) can be reduced to O(E) lol.
+
+3.
+a. Recursive
+Lmao im tired guys can yall do the recursive approach I outlined the algo for the iterative below thx ly guys.
+
+b. Iterative
+Assumption: The Eulerian graph is undirected.
+Step 1: Start from a single node. Push that node onto the stack.
+Step 2: Move to one of the neighbors of that node, and remove the edge that you just used to traverse.
+Step 3: Push your current node onto the stack again.
+Step 4.a: If there is another neighbor connected to the current node, repeat at Step 2.
+Step 4.b: If there are no more edges, exit the loop and pop off all the vertices from the stack. The order at which you pop them off is the Eulerian path.
+
+4.
+For an undirected graph, you can always split it up into edges that are in simple cycles and those that are not. Note that an edge can be a part of two different simple cycles. Also note that for every simple cycle, every edge RC every other edge in that simple cycle. This is true because every edge is a subset of the edges in the simple cycle. Thus, if we let each edge be a vertex in a new graph, we end up with a very interesting new graph. For simple cycles of 3, 4, 5, etc. edges, we end up with complete subgraphs of size 3, 4, 5, etc. Those that are not part of cycles just float around in space I guess. I assume the interesting partition though is the set of complete graphs we now have.

@@ -1,0 +1,32 @@
+Solution 1: The problem never really specified what kind of partition they wanted, so I picked an easy one
+to figure out. Each edge can only be part of 3 groups. Either it is part of no cycle, part of 1 cycle, or 
+part of 2 cycles (on either side of the edge). Kind of cool thing but not really related to the problem
+as it has nothing to do with RC relation.
+
+Solution 2: This one takes advantage of the RC relation. :). Basically my idea is that given a simple cycle
+of lets say n edges, aka an n-sided polygon, if we were to label all the edges lets say a_1 through a_n, 
+and convert the edges to vertices in a new graph, we would end up with a complete graph because all edges 
+in a simple cycle are pairwise RC with each other. This is really cool because for any n-sided simple cycle
+that corresponds to an n-wise complete subgraph in our newly mapped graph. Thus, each edge falls into a certain
+category with label n. That is another way to partition.
+
+NOTE: both of the above algorithms use BFS/DFS to figure out what the simple cycle is, and then loops through
+every edge (getting details on where the cycles containing the edges are, if there are any), and adds them to 
+a map data structure that maps the category (in the case of solution 2, the degree of the complete graph).
+
+
+Solution 3: A partition of a set is defined by an equivalence relation on a set. Every partition defines an 
+equivalence relation as well. We will look at the former constraint in order to prove that a partition
+exists in the graph. We must prove 3 ideals for it to be an equivalence relation:
+
+1) Reflexivity a~a.
+	- This is true. For every edge, it RC with itself.
+2) Symmetry a~b if and only if b~a
+	- If b RC a then a RC b because they are part of the same simple cycle.
+	- If b does not RC a, then b and a are part of different simple cycles so a does not RC b as well.
+3) Transitivity: if a~b and b~c then a~c
+	- This is true because if a RC b, then a and b are in the same cycle. If b RC c then b and c
+	are in the same cycle. Thus, a, b, and c are all in the same cycle. Thus, a RC c.
+
+Since we have proven all requirements for there to be an equivalence relation in the set of edges,
+we have proved that a partition is possible for the set.
